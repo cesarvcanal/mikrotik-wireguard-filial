@@ -68,3 +68,15 @@ Edite as variáveis no topo de [`filial-vpn.rsc`](filial-vpn.rsc) e cole no term
 ## Licença
 
 MIT — use, adapte, monte sua rede.
+
+## Contingência: internet da loja caiu
+
+Loja sem internet não pode parar. O plano B barato: um chip 4G num modem/roteador secundário na **WAN2** com failover automático:
+
+```routeros
+# rota principal (WAN1) monitorada por ping; se cair, a WAN2 assume
+/ip route add dst-address=0.0.0.0/0 gateway=<GW_WAN1> distance=1 check-gateway=ping
+/ip route add dst-address=0.0.0.0/0 gateway=<GW_WAN2_4G> distance=2
+```
+
+O túnel WireGuard se reconecta sozinho pela WAN2 (o `persistent-keepalive` cuida disso). Teste o failover ANTES de precisar dele: desliga a WAN1 e confere `/ip route print` e o handshake.
